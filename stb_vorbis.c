@@ -4345,7 +4345,7 @@ int stb_vorbis_decode_frame_pushdata(
          while (get8_packet(f) != EOP)
             if (f->eof) break;
          *samples = 0;
-         return f->stream - data;
+         return (int)(f->stream - data);
       }
       if (error == VORBIS_continued_packet_flag_invalid) {
          if (f->previous_length == 0) {
@@ -4355,7 +4355,7 @@ int stb_vorbis_decode_frame_pushdata(
             while (get8_packet(f) != EOP)
                if (f->eof) break;
             *samples = 0;
-            return f->stream - data;
+            return (int)(f->stream - data);
          }
       }
       // if we get an error while parsing, what to do?
@@ -4375,7 +4375,7 @@ int stb_vorbis_decode_frame_pushdata(
    if (channels) *channels = f->channels;
    *samples = len;
    *output = f->outputs;
-   return f->stream - data;
+   return (int)(f->stream - data);
 }
 
 stb_vorbis *stb_vorbis_open_pushdata(
@@ -4398,7 +4398,7 @@ stb_vorbis *stb_vorbis_open_pushdata(
    f = vorbis_alloc(&p);
    if (f) {
       *f = p;
-      *data_used = f->stream - data;
+      *data_used = (int)(f->stream - data);
       *error = 0;
       return f;
    } else {
@@ -4413,7 +4413,7 @@ unsigned int stb_vorbis_get_file_offset(stb_vorbis *f)
    #ifndef STB_VORBIS_NO_PUSHDATA_API
    if (f->push_mode) return 0;
    #endif
-   if (USE_MEMORY(f)) return f->stream - f->stream_start;
+   if (USE_MEMORY(f)) return (int)(f->stream - f->stream_start);
    #ifndef STB_VORBIS_NO_STDIO
    return ftell(f->f) - f->f_start;
    #endif
