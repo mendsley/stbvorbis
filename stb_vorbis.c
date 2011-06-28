@@ -812,7 +812,10 @@ extern int my_prof(int slot);
 //#define stb_prof my_prof
 
 #ifndef stb_prof
-#define stb_prof(x)  0
+//heat-modif @begin - Explicitly ignoring result of calling stb_prof(x)
+//#define stb_prof(x)  0
+#define stb_prof(x)  (void)0
+//heat-modif @end
 #endif
 
 #if defined(STB_VORBIS_NO_PUSHDATA_API)
@@ -1376,11 +1379,15 @@ static int start_page_no_capturepattern(vorb *f)
    f->end_seg_with_known_loc = -2;
    if (loc0 != ~0 || loc1 != ~0) {
       // determine which packet is the last one that will complete
-      for (i=f->segment_count-1; i >= 0; --i)
+//heat-modif @begin - Fixing broken loop (comparing uint32 >= 0 always is true)
+//    for (i=f->segment_count-1; i >= 0; --i)
+      for (i=f->segment_count-1; i > 0; --i)
          if (f->segments[i] < 255)
             break;
       // 'i' is now the index of the _last_ segment of a packet that ends
-      if (i >= 0) {
+//      if (i >= 0) {
+      if ( i != 0 || f->segments[0] < 255 ) {
+//heat-modif @end
          f->end_seg_with_known_loc = i;
          f->known_loc_for_packet   = loc0;
       }
