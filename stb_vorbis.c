@@ -2105,7 +2105,9 @@ static void decode_residue(vorb *f, float *residue_buffers[], int ch, int n, int
          memset(residue_buffers[i], 0, sizeof(float) * n);
 
    if (rtype == 2 && ch != 1) {
-      int len = ch * n;
+//M-BEGIN - BK - fixing: local variable is initialized but not referenced -
+//   int len = ch * n;
+//M-END - BK
       for (j=0; j < ch; ++j)
          if (!do_not_decode[j])
             break;
@@ -2359,7 +2361,10 @@ void dct_iv_slow(float *buffer, int n)
    float mcos[16384];
    float x[2048];
    int i,j;
-   int n2 = n >> 1, nmask = (n << 3) - 1;
+//M-BEGIN - BK - fixing: local variable is initialized but not referenced -
+//   int n2 = n >> 1;
+   int nmask = (n << 3) - 1;
+//M-END - BK
    memcpy(x, buffer, sizeof(*x) * n);
    for (i=0; i < 8*n; ++i)
       mcos[i] = (float) cos(M_PI / 4 * i / n);
@@ -2611,7 +2616,9 @@ static __forceinline void iter_54(float *z)
 
 static void imdct_step3_inner_s_loop_ld654(int n, float *e, int i_off, float *A, int base_n)
 {
-   int k_off = -8;
+//M-BEGIN - BK - fixing: local variable is initialized but not referenced -
+//   int k_off = -8;
+//M-END - BK
    int a_off = base_n >> 3;
    float A2 = A[0+a_off];
    float *z = e + i_off;
@@ -2657,7 +2664,10 @@ static void imdct_step3_inner_s_loop_ld654(int n, float *e, int i_off, float *A,
 static void inverse_mdct(float *buffer, int n, vorb *f, int blocktype)
 {
    int n2 = n >> 1, n4 = n >> 2, n8 = n >> 3, l;
-   int n3_4 = n - n4, ld;
+//M-BEGIN - BK - fixing: local variable is initialized but not referenced -
+//   int n3_4 = n - n4;
+   int ld;
+//M-END - BK
    // @OPTIMIZE: reduce register pressure by using fewer variables?
    int save_point = temp_alloc_save(f);
    float *buf2 = (float *) temp_alloc(f, n2 * sizeof(*buf2));
@@ -4354,7 +4364,7 @@ int stb_vorbis_decode_frame_pushdata(
          *samples = 0;
 //M-BEGIN - BK - 64-bit fix.
          return (int)(f->stream - data);
-//M-END
+//M-END - BK
       }
       if (error == VORBIS_continued_packet_flag_invalid) {
          if (f->previous_length == 0) {
@@ -4366,7 +4376,7 @@ int stb_vorbis_decode_frame_pushdata(
             *samples = 0;
 //M-BEGIN - BK - 64-bit fix.
             return (int)(f->stream - data);
-//M-END
+//M-END - BK
          }
       }
       // if we get an error while parsing, what to do?
@@ -4388,7 +4398,7 @@ int stb_vorbis_decode_frame_pushdata(
    *output = f->outputs;
 //M-BEGIN - BK - 64-bit fix.
    return (int)(f->stream - data);
-//M-END
+//M-END - BK
 }
 
 stb_vorbis *stb_vorbis_open_pushdata(
@@ -4413,7 +4423,7 @@ stb_vorbis *stb_vorbis_open_pushdata(
       *f = p;
 //M-BEGIN - BK - 64-bit fix.
       *data_used = (int)(f->stream - data);
-//M-END
+//M-END - BK
       *error = 0;
       return f;
    } else {
@@ -4430,7 +4440,7 @@ unsigned int stb_vorbis_get_file_offset(stb_vorbis *f)
    #endif
 //M-BEGIN - BK - 64-bit fix.
    if (USE_MEMORY(f)) return (unsigned int)(f->stream - f->stream_start);
-//M-END
+//M-END - BK
    #ifndef STB_VORBIS_NO_STDIO
    return ftell(f->f) - f->f_start;
    #endif
