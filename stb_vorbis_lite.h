@@ -11,17 +11,16 @@ extern "C" {
 #endif
 
 struct stb_vorbis;
-struct stb_vorbis_stream_info;
-extern stb_vorbis * stb_vorbis_from_memory(unsigned char *data, int len);
 extern void stb_vorbis_close(stb_vorbis *f);
-extern int stb_vorbis_get_samples_short_interleaved(stb_vorbis *f, int channels, short *buffer, int num_shorts);
-extern void stb_vorbis_get_stream_info( stb_vorbis* v, stb_vorbis_stream_info* info );
+stb_vorbis *stb_vorbis_for_push( unsigned char *data, int len, int *consumed, int *error );
+extern int stb_vorbis_decode_frame_pushdata(
+         stb_vorbis *f, unsigned char *datablock, int datablock_length_in_bytes,
+         int *channels,             // place to write number of float * buffers
+         float ***output,           // place to write float ** array of float * buffers
+         int *samples               // place to write number of output samples
+     );
 
-struct stb_vorbis_stream_info
-{
-	int channels;
-	unsigned int sample_rate;
-};
+static const int c_vorbisError_NeedMoreData = 1;
 
 #ifdef __cplusplus
 }

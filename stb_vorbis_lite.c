@@ -9,17 +9,11 @@
 extern "C" {
 #endif
 
-void stb_vorbis_get_stream_info( stb_vorbis* v, stb_vorbis_stream_info* info )
+stb_vorbis *stb_vorbis_for_push( unsigned char *data, int len, int *consumed, int *error )
 {
-	stb_vorbis_info vinfo = stb_vorbis_get_info(v);
-	info->channels = vinfo.channels;
-	info->sample_rate = vinfo.sample_rate;
+	return stb_vorbis_open_pushdata(data, len, consumed, error, NULL);
 }
 
-stb_vorbis * stb_vorbis_from_memory( unsigned char *data, int len )
-{
-	return stb_vorbis_open_memory( data, len, NULL, NULL );
-}
 
 #ifdef __cplusplus
 }
