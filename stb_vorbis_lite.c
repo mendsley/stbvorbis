@@ -14,6 +14,11 @@ stb_vorbis *stb_vorbis_for_push( unsigned char *data, int len, int *consumed, in
 	return stb_vorbis_open_pushdata(data, len, consumed, error, NULL);
 }
 
+int stb_vorbis_get_sample_rate( stb_vorbis* stream )
+{
+	const stb_vorbis_info info = stb_vorbis_get_info(stream);
+	return info.sample_rate;
+}
 
 #ifdef __cplusplus
 }
