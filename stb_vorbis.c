@@ -3207,12 +3207,12 @@ static int vorbis_decode_packet_rest(vorb *f, int *len, Mode *m, int left_start,
    int i,j,k,n,n2;
    int zero_channel[256];
    int really_zero_channel[256];
-   int window_center;
+   //int window_center;
 
 // WINDOWING
 
    n = f->blocksize[m->blockflag];
-   window_center = n >> 1;
+   //window_center = n >> 1;
 
    map = &f->mapping[m->mapping];
 
@@ -3327,7 +3327,7 @@ static int vorbis_decode_packet_rest(vorb *f, int *len, Mode *m, int left_start,
 // RESIDUE DECODE
    for (i=0; i < map->submaps; ++i) {
       float *residue_buffers[STB_VORBIS_MAX_CHANNELS];
-      int r,t;
+      int r/*,t*/;
       uint8 do_not_decode[256];
       int ch = 0;
       for (j=0; j < f->channels; ++j) {
@@ -3343,7 +3343,7 @@ static int vorbis_decode_packet_rest(vorb *f, int *len, Mode *m, int left_start,
          }
       }
       r = map->submap_residue[i];
-      t = f->residue_types[r];
+      //t = f->residue_types[r];
       decode_residue(f, residue_buffers, ch, n2, r, do_not_decode);
    }
 
