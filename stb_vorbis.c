@@ -1305,6 +1305,7 @@ static void skip(vorb *z, int n)
    #endif
 }
 
+#ifdef STB_VORBIS_NO_PUSHDATA_API
 static int set_file_offset(stb_vorbis *f, unsigned int loc)
 {
    #ifndef STB_VORBIS_NO_PUSHDATA_API
@@ -1335,6 +1336,7 @@ static int set_file_offset(stb_vorbis *f, unsigned int loc)
    return 0;
    #endif
 }
+#endif
 
 
 static uint8 ogg_page_header[4] = { 0x4f, 0x67, 0x67, 0x53 };
@@ -1533,6 +1535,7 @@ static uint32 get_bits(vorb *f, int n)
    return z;
 }
 
+#if 0
 static int32 get_bits_signed(vorb *f, int n)
 {
    uint32 z = get_bits(f, n);
@@ -1540,6 +1543,7 @@ static int32 get_bits_signed(vorb *f, int n)
       z += ~((1 << n) - 1);
    return (int32) z;
 }
+#endif
 
 // @OPTIMIZE: primary accumulator for huffman
 // expand the buffer to as many bits as possible without reading off end of packet
@@ -1624,23 +1628,6 @@ static int codebook_decode_scalar_raw(vorb *f, Codebook *c)
    return -1;
 }
 
-static int codebook_decode_scalar(vorb *f, Codebook *c)
-{
-   int i;
-   if (f->valid_bits < STB_VORBIS_FAST_HUFFMAN_LENGTH)
-      prep_huffman(f);
-   // fast huffman table lookup
-   i = f->acc & FAST_HUFFMAN_TABLE_MASK;
-   i = c->fast_huffman[i];
-   if (i >= 0) {
-      f->acc >>= c->codeword_lengths[i];
-      f->valid_bits -= c->codeword_lengths[i];
-      if (f->valid_bits < 0) { f->valid_bits = 0; return -1; }
-      return i;
-   }
-   return codebook_decode_scalar_raw(f,c);
-}
-
 #ifndef STB_VORBIS_NO_INLINE_DECODE
 
 #define DECODE_RAW(var, f,c)                                  \
@@ -1658,6 +1645,23 @@ static int codebook_decode_scalar(vorb *f, Codebook *c)
    }
 
 #else
+
+static int codebook_decode_scalar(vorb *f, Codebook *c)
+{
+   int i;
+   if (f->valid_bits < STB_VORBIS_FAST_HUFFMAN_LENGTH)
+      prep_huffman(f);
+   // fast huffman table lookup
+   i = f->acc & FAST_HUFFMAN_TABLE_MASK;
+   i = c->fast_huffman[i];
+   if (i >= 0) {
+      f->acc >>= c->codeword_lengths[i];
+      f->valid_bits -= c->codeword_lengths[i];
+      if (f->valid_bits < 0) { f->valid_bits = 0; return -1; }
+      return i;
+   }
+   return codebook_decode_scalar_raw(f,c);
+}
 
 #define DECODE_RAW(var,f,c)    var = codebook_decode_scalar(f,c);
 
@@ -3517,12 +3521,14 @@ static int vorbis_finish_frame(stb_vorbis *f, int len, int left, int right)
    return right - left;
 }
 
+#ifndef STB_VORBIS_NO_PULLDATA_API
 static void vorbis_pump_first_frame(stb_vorbis *f)
 {
    int len, right, left;
    if (vorbis_decode_packet(f, &len, &left, &right))
       vorbis_finish_frame(f, len, left, right);
 }
+#endif
 
 #ifndef STB_VORBIS_NO_PUSHDATA_API
 static int is_whole_packet_present(stb_vorbis *f, int end_page)
@@ -3933,7 +3939,7 @@ static int start_decoder(vorb *f)
             g->sorted_order[j] = (uint8) p[j].y;
          // precompute the neighbors
          for (j=2; j < g->values; ++j) {
-            int low,hi;
+            int low = -1, hi = 65536;
             neighbors(g->Xlist, j, &low,&hi);
             g->neighbors[j][0] = low;
             g->neighbors[j][1] = hi;
