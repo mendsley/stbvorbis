@@ -1305,7 +1305,7 @@ static void skip(vorb *z, int n)
    #endif
 }
 
-#ifdef STB_VORBIS_NO_PUSHDATA_API
+#ifndef STB_VORBIS_NO_PULLDATA_API
 static int set_file_offset(stb_vorbis *f, unsigned int loc)
 {
    #ifndef STB_VORBIS_NO_PUSHDATA_API
