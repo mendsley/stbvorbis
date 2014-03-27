@@ -32,11 +32,11 @@ extern "C" {
 #endif
 
 struct stb_vorbis;
-extern void stb_vorbis_close(stb_vorbis *f);
-stb_vorbis *stb_vorbis_for_push( unsigned char *data, int len, int *consumed, int *error );
-int stb_vorbis_get_sample_rate( stb_vorbis* stream );
+extern void stb_vorbis_close(struct stb_vorbis *f);
+struct stb_vorbis *stb_vorbis_for_push( unsigned char *data, int len, int *consumed, int *error );
+int stb_vorbis_get_sample_rate(struct stb_vorbis* stream);
 extern int stb_vorbis_decode_frame_pushdata(
-         stb_vorbis *f, unsigned char *datablock, int datablock_length_in_bytes,
+         struct stb_vorbis *f, unsigned char *datablock, int datablock_length_in_bytes,
          int *channels,             // place to write number of float * buffers
          float ***output,           // place to write float ** array of float * buffers
          int *samples               // place to write number of output samples
